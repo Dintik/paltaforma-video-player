@@ -17,8 +17,8 @@ export default {
       },
       keyframes: {
         'spin-reverse': {
-          'from': { transform: 'rotate(360deg)' },
-          'to': { transform: 'rotate(0deg)' }
+          from: { transform: 'rotate(360deg)' },
+          to: { transform: 'rotate(0deg)' }
         }
       }
     }

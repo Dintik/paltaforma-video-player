@@ -35,7 +35,7 @@ export const useVideoPlayer = () => {
 
       const deletedVideoIndex = videos.findIndex((video) => video._id === id)
       setVideos((prevVideos) => prevVideos.filter((video) => video._id !== id))
-      
+
       updateCurrentIndexAfterDelete(deletedVideoIndex)
     } catch (error) {
       console.error('Error deleting video:', error)
@@ -85,4 +85,4 @@ export const useVideoPlayer = () => {
     handleDeleteVideo,
     resetToDefault
   }
-} 
+}
