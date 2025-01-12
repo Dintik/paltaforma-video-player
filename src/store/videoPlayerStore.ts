@@ -50,7 +50,7 @@ export const useVideoPlayerStore = create<VideoStore>()((set, get) => ({
       const { videos, currentVideoIndex } = get()
       const deletedVideoIndex = videos.findIndex((video) => video._id === id)
       const newVideos = videos.filter((video) => video._id !== id)
-      
+
       let newIndex = currentVideoIndex
       if (videos.length <= 1) {
         newIndex = 0
@@ -62,10 +62,10 @@ export const useVideoPlayerStore = create<VideoStore>()((set, get) => ({
         newIndex = currentVideoIndex - 1
       }
 
-      set({ 
+      set({
         videos: newVideos,
         currentVideoIndex: newIndex,
-        deletingId: null 
+        deletingId: null
       })
     } catch (error) {
       console.error('Error deleting video:', error)
@@ -84,5 +84,5 @@ export const useVideoPlayerStore = create<VideoStore>()((set, get) => ({
     } finally {
       set({ isResetting: false })
     }
-  },
+  }
 }))

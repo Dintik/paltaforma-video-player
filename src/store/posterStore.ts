@@ -98,7 +98,11 @@ export const usePosterStore = create<PosterStore>()((set, get) => ({
 
         video.onerror = () => {
           clearTimeout(timeoutId)
-          reject(new Error(`Failed to load video: ${video.error?.message || 'unknown error'}`))
+          reject(
+            new Error(
+              `Failed to load video: ${video.error?.message || 'unknown error'}`
+            )
+          )
         }
 
         video.onabort = () => {
@@ -111,15 +115,16 @@ export const usePosterStore = create<PosterStore>()((set, get) => ({
       })
     } catch (err) {
       console.error('Poster generation error:', err)
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate poster'
-      
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to generate poster'
+
       set((state) => ({
         errors: { ...state.errors, [videoUrl]: errorMessage },
         posters: state.posters
       }))
     } finally {
       set((state) => ({
-        loadingUrls: state.loadingUrls.filter(url => url !== videoUrl)
+        loadingUrls: state.loadingUrls.filter((url) => url !== videoUrl)
       }))
     }
   }
