@@ -27,11 +27,7 @@ export const useVideoPlayer = () => {
   const handleDeleteVideo = async (id: string) => {
     try {
       setDeletingId(id)
-      const response = await fetch(`/api/videos/${id}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) throw new Error('Failed to delete video')
+      await videoService.delete(id)
 
       const deletedVideoIndex = videos.findIndex((video) => video._id === id)
       setVideos((prevVideos) => prevVideos.filter((video) => video._id !== id))
