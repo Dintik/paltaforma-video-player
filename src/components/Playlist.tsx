@@ -85,6 +85,7 @@ export const Playlist = ({
                   <Image
                     src={CheckboxUnselected}
                     alt='Checkbox unselected'
+                    className='w-auto h-auto'
                     width={16}
                     height={16}
                   />

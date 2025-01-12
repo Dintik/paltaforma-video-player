@@ -1,18 +1,42 @@
-import { useState, useCallback, useEffect } from 'react'
+import { create } from 'zustand'
 
-export const useVideoPoster = (videoUrl: string, defaultPoster?: string) => {
-  const [poster, setPoster] = useState<string>(defaultPoster || '')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+interface PosterState {
+  posters: Record<string, string>
+  loadingUrls: string[]
+  errors: Record<string, string | null>
+}
 
-  const generatePoster = useCallback(async () => {
+interface PosterActions {
+  generatePoster: (videoUrl: string) => Promise<void>
+  isLoading: (videoUrl: string) => boolean
+  getError: (videoUrl: string) => string | null | undefined
+}
+
+type PosterStore = PosterState & PosterActions
+
+export const usePosterStore = create<PosterStore>()((set, get) => ({
+  posters: {},
+  loadingUrls: [],
+  errors: {},
+
+  isLoading: (videoUrl) => get().loadingUrls.includes(videoUrl),
+  getError: (videoUrl) => get().errors[videoUrl],
+
+  generatePoster: async (videoUrl) => {
     if (!videoUrl) {
       console.log('No video URL provided')
       return
     }
 
-    setIsLoading(true)
-    setError(null)
+    const existingPoster = get().posters[videoUrl]
+    if (existingPoster) {
+      return
+    }
+
+    set((state) => ({
+      loadingUrls: [...state.loadingUrls, videoUrl],
+      errors: { ...state.errors, [videoUrl]: null }
+    }))
 
     try {
       const video = document.createElement('video')
@@ -31,7 +55,6 @@ export const useVideoPoster = (videoUrl: string, defaultPoster?: string) => {
             reject(new Error('Invalid video dimensions'))
             return
           }
-
           video.currentTime = 1
         }
 
@@ -59,10 +82,11 @@ export const useVideoPoster = (videoUrl: string, defaultPoster?: string) => {
             }
 
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-
             const posterUrl = canvas.toDataURL('image/jpeg', 0.85)
 
-            setPoster(posterUrl)
+            set((state) => ({
+              posters: { ...state.posters, [videoUrl]: posterUrl }
+            }))
             resolve(posterUrl)
           } catch (err) {
             console.error('Error in poster generation:', err)
@@ -74,12 +98,7 @@ export const useVideoPoster = (videoUrl: string, defaultPoster?: string) => {
 
         video.onerror = () => {
           clearTimeout(timeoutId)
-          console.error('Video loading error:', video.error)
-          reject(
-            new Error(
-              `Failed to load video: ${video.error?.message || 'unknown error'}`
-            )
-          )
+          reject(new Error(`Failed to load video: ${video.error?.message || 'unknown error'}`))
         }
 
         video.onabort = () => {
@@ -92,18 +111,16 @@ export const useVideoPoster = (videoUrl: string, defaultPoster?: string) => {
       })
     } catch (err) {
       console.error('Poster generation error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to generate poster')
-      if (defaultPoster) {
-        setPoster(defaultPoster)
-      }
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate poster'
+      
+      set((state) => ({
+        errors: { ...state.errors, [videoUrl]: errorMessage },
+        posters: state.posters
+      }))
     } finally {
-      setIsLoading(false)
+      set((state) => ({
+        loadingUrls: state.loadingUrls.filter(url => url !== videoUrl)
+      }))
     }
-  }, [videoUrl, defaultPoster])
-
-  useEffect(() => {
-    generatePoster()
-  }, [generatePoster])
-
-  return { poster, isLoading, error, regenerate: generatePoster }
-}
+  }
+}))
