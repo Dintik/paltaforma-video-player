@@ -1,11 +1,46 @@
+'use client'
+
 import Container from '@/components/Container'
+import { VideoJS } from '@/components/VideoJS'
+import { useRef } from 'react'
+import Player from 'video.js/dist/types/player'
+import videojs from 'video.js'
 
 export default function VideoPlayer() {
+  const playerRef = useRef<Player>(null)
+
+  const videoJsOptions = {
+    autoplay: false,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    sources: [
+      {
+        src: 'https://vjs.zencdn.net/v/oceans.mp4',
+        type: 'video/mp4'
+      }
+    ]
+  }
+
+  const handlePlayerReady = (player: Player) => {
+    playerRef.current = player
+
+    player.on('waiting', () => {
+      videojs.log('player is waiting')
+    })
+
+    player.on('dispose', () => {
+      videojs.log('player will dispose')
+    })
+  }
+
   return (
     <Container>
-      <div className='flex flex-grow gap-[23px]'>
+      <div className='flex justify-between'>
         <div className='w-[626px] flex flex-col'>
-          <div className='relative aspect-video bg-black'></div>
+          <div className='relative aspect-video w-full'>
+            <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+          </div>
 
           <div className='py-6'>
             <h2 className='text-xl font-medium text-gray-900 dark:text-white mb-4'>
