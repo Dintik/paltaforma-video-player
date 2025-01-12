@@ -106,7 +106,7 @@ export default function VideoPlayer() {
           </div>
         </div>
 
-        <div className='w-[295px] bg-gray-100 dark:bg-[#121214] py-6 px-3'>
+        <div className='w-[295px] bg-gray-100 dark:bg-[#121214] py-6 px-3 h-fit'>
           <div className='mb-6'>
             <h3 className='text-gray-900 dark:text-white font-medium mb-2'>
               Playlist
