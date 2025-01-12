@@ -4,7 +4,6 @@ export interface IVideo {
   src: string;
   type: string;
   duration: string;
-  poster: string;
   description: string;
   createdAt?: Date;
   updatedAt?: Date;

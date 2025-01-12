@@ -11,6 +11,7 @@ import videojs from 'video.js'
 import CheckboxSelected from '@/assets/images/CheckboxSelected.svg'
 import CheckboxUnselected from '@/assets/images/CheckboxUnselected.svg'
 import { NavigationButton } from '@/components/NavigationButton'
+import { useVideoPoster } from '@/hooks/useVideoPoster'
 
 export default function VideoPlayer() {
   const playerRef = useRef<Player>(null)
@@ -19,6 +20,12 @@ export default function VideoPlayer() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const currentVideo = videos[currentVideoIndex]
+  const { poster, isLoading: isPosterLoading } = useVideoPoster(
+    currentVideo?.src,
+    '/images/default-poster.png'
+  )
+
   const videoJsOptions = {
     autoplay: false,
     controls: true,
@@ -26,17 +33,17 @@ export default function VideoPlayer() {
     fluid: true,
     aspectRatio: '16:9',
     preload: 'auto',
-    poster: videos[currentVideoIndex]?.poster || '',
+    poster: poster,
     controlBar: {
       skipButtons: {
         backward: 10
       }
     },
-    sources: videos[currentVideoIndex]
+    sources: currentVideo
       ? [
           {
-            src: videos[currentVideoIndex].src,
-            type: videos[currentVideoIndex].type
+            src: currentVideo.src,
+            type: currentVideo.type
           }
         ]
       : []
@@ -149,7 +156,18 @@ export default function VideoPlayer() {
                   />
                 )}
 
-                <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+                <div className='relative'>
+                  {isPosterLoading ? (
+                    <div className='w-full aspect-video bg-black flex items-center justify-center'>
+                      <div className='w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin' />
+                    </div>
+                  ) : (
+                    <VideoJS
+                      options={videoJsOptions}
+                      onReady={handlePlayerReady}
+                    />
+                  )}
+                </div>
 
                 {currentVideoIndex !== videos.length - 1 && (
                   <NavigationButton

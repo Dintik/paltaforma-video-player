@@ -19,10 +19,6 @@ const VideoSchema = new mongoose.Schema<IVideo>({
     type: String,
     required: [true, 'Duration is required']
   },
-  poster: {
-    type: String,
-    required: [true, 'Poster URL is required']
-  },
   description: {
     type: String,
     required: [true, 'Description is required']
