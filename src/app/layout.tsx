@@ -24,7 +24,7 @@ export default function RootLayout({
         <ThemeProvider attribute='class'>
           <div className='flex min-h-screen flex-col bg-white dark:bg-[#1C1C1C]'>
             <Header />
-            <main className='flex-1 pt-5 pb-8 flex'>{children}</main>
+            <main className='flex-1 pt-8 pb-12 flex'>{children}</main>
           </div>
         </ThemeProvider>
       </body>

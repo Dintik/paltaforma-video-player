@@ -17,6 +17,7 @@ export default function VideoPlayer() {
     sources: [
       {
         src: 'https://vjs.zencdn.net/v/oceans.mp4',
+        // src: 'https://videos.pexels.com/video-files/855418/855418-hd_1920_1080_25fps.mp4',
         type: 'video/mp4'
       }
     ]
@@ -38,13 +39,13 @@ export default function VideoPlayer() {
     <Container>
       <div className='flex justify-between'>
         <div className='w-[626px] flex flex-col'>
-          <div className='relative aspect-video w-full'>
+          <div className='relative w-full'>
             <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
           </div>
 
           <div className='py-6'>
             <h2 className='text-xl font-medium text-gray-900 dark:text-white mb-4'>
-              Descrição
+              Description
             </h2>
             <p className='text-gray-600 dark:text-gray-400'>
               Este curso tem como objetivo te dar os fundamentos da programação
@@ -67,7 +68,6 @@ export default function VideoPlayer() {
             </span>
           </div>
 
-          {/* Lessons list */}
           <div className='space-y-4'>
             <div className='flex items-center gap-4 p-4 rounded bg-gray-200 dark:bg-[#202024]'>
               <div className='w-12 h-12 rounded bg-gray-300 dark:bg-[#323238] flex items-center justify-center'>
