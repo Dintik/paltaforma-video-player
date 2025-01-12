@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import AvatarIcon from '@/assets/images/avatar.svg'
+import AvatarIcon from '@/assets/images/Avatar.svg'
 import LogoIcon from '@/assets/images/Logo.svg'
 import Container from './Container'
 
