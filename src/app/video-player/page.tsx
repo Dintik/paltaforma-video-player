@@ -17,8 +17,10 @@ export default function VideoPlayer() {
   const playerRef = useRef<Player>(null)
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
   const [videos, setVideos] = useState<IVideo[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [isResetting, setIsResetting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const currentVideo = videos[currentVideoIndex]
   const { poster, isLoading: isPosterLoading } = useVideoPoster(
@@ -51,7 +53,7 @@ export default function VideoPlayer() {
 
   const fetchVideos = async () => {
     try {
-      setLoading(true)
+      setIsInitialLoading(true)
       const data = await videoService.getAll()
       setVideos(data)
       setError(null)
@@ -59,7 +61,7 @@ export default function VideoPlayer() {
       console.error('Error fetching videos:', err)
       setError('Failed to load videos')
     } finally {
-      setLoading(false)
+      setIsInitialLoading(false)
     }
   }
 
@@ -91,15 +93,53 @@ export default function VideoPlayer() {
     })
   }
 
+  const handleDeleteVideo = async (id: string) => {
+    try {
+      const response = await fetch(`/api/videos/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete video')
+      }
+
+      // Find index of video being deleted
+      const deletedVideoIndex = videos.findIndex((video) => video._id === id)
+
+      // Update videos list
+      setVideos((prevVideos) => prevVideos.filter((video) => video._id !== id))
+
+      // Adjust currentVideoIndex
+      if (videos.length > 1) {
+        if (deletedVideoIndex === currentVideoIndex) {
+          // If deleting current video
+          if (deletedVideoIndex === videos.length - 1) {
+            // If it's the last video, switch to previous one
+            setCurrentVideoIndex(currentVideoIndex - 1)
+          }
+          // If not last, index will stay the same and automatically point to next video
+        } else if (deletedVideoIndex < currentVideoIndex) {
+          // If deleting video before current one, decrease index
+          setCurrentVideoIndex(currentVideoIndex - 1)
+        }
+      } else {
+        // If deleting the last remaining video
+        setCurrentVideoIndex(0)
+      }
+    } catch (error) {
+      console.error('Error deleting video:', error)
+    }
+  }
+
   return (
     <Container>
       <div className='flex justify-between'>
         <div className='w-[626px] flex flex-col'>
           <div className='relative w-full group'>
-            {loading ? (
+            {isInitialLoading ? (
               <div className='aspect-video bg-gray-100 dark:bg-[#121214] flex items-center justify-center'>
                 <div className='flex flex-col items-center gap-4'>
-                  <div className='w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin' />
+                  <div className='w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin' />
                   <span className='text-gray-600 dark:text-gray-400'>
                     Loading videos...
                   </span>
@@ -204,21 +244,24 @@ export default function VideoPlayer() {
                 <button
                   onClick={async () => {
                     try {
-                      setLoading(true)
+                      setIsResetting(true)
                       await videoService.resetToDefault()
                       await fetchVideos()
                     } catch (err) {
                       console.error('Reset error:', err)
                       setError('Failed to reset videos')
                     } finally {
-                      setLoading(false)
+                      setIsResetting(false)
                     }
                   }}
-                  className='p-2 text-sm text-blue-500 hover:text-blue-600 transition-colors'
+                  className='p-2 text-sm hover:text-blue-600 transition-colors'
                   title='Reset to default videos'
+                  disabled={isResetting}
                 >
                   <svg
-                    className='w-4 h-4'
+                    className={`w-4 h-4 text-gray-900 dark:text-white ${
+                      isResetting ? 'animate-spin-reverse' : ''
+                    }`}
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
@@ -238,38 +281,69 @@ export default function VideoPlayer() {
               {videos.map((video, index) => (
                 <div
                   key={index}
-                  onClick={() =>
-                    currentVideoIndex !== index && handleVideoChange(index)
-                  }
-                  className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
+                  className={`flex items-center gap-1 p-2 rounded ${
                     currentVideoIndex === index
                       ? 'bg-gray-300 dark:bg-[#29292e]'
                       : 'bg-gray-200 dark:bg-[#202024] hover:bg-gray-300 dark:hover:bg-[#29292e]'
                   }`}
                 >
-                  {currentVideoIndex === index ? (
-                    <Image
-                      src={CheckboxSelected}
-                      alt='Checkbox selected'
-                      width={16}
-                      height={16}
-                    />
-                  ) : (
-                    <Image
-                      src={CheckboxUnselected}
-                      alt='Checkbox unselected'
-                      width={16}
-                      height={16}
-                    />
-                  )}
-                  <div className='flex justify-between items-center w-full gap-3'>
-                    <h4 className='text-gray-900 dark:text-white font-medium text-sm'>
-                      {index + 1}. {video.title}
-                    </h4>
-                    <span className='text-sm text-gray-600 dark:text-gray-400'>
-                      {video.duration}
-                    </span>
+                  <div
+                    className='flex-1 flex items-center gap-2 cursor-pointer'
+                    onClick={() =>
+                      currentVideoIndex !== index && handleVideoChange(index)
+                    }
+                  >
+                    {currentVideoIndex === index ? (
+                      <Image
+                        src={CheckboxSelected}
+                        alt='Checkbox selected'
+                        width={16}
+                        height={16}
+                      />
+                    ) : (
+                      <Image
+                        src={CheckboxUnselected}
+                        alt='Checkbox unselected'
+                        width={16}
+                        height={16}
+                      />
+                    )}
+                    <div className='flex justify-between items-center w-full gap-3'>
+                      <h4 className='text-gray-900 dark:text-white font-medium text-sm'>
+                        {index + 1}. {video.title}
+                      </h4>
+                      <span className='text-sm text-gray-600 dark:text-gray-400'>
+                        {video.duration}
+                      </span>
+                    </div>
                   </div>
+                  <button
+                    onClick={async () => {
+                      setDeletingId(video._id)
+                      await handleDeleteVideo(video._id)
+                      setDeletingId(null)
+                    }}
+                    disabled={deletingId === video._id}
+                    className='p-1.5 text-gray-500 hover:text-red-500 transition-colors rounded-full hover:bg-gray-400/10 disabled:opacity-50'
+                    title='Delete video'
+                  >
+                    {deletingId === video._id ? (
+                      <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-transparent' />
+                    ) : (
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='h-4 w-4'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               ))}
             </div>

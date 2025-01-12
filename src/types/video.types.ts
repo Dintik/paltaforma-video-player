@@ -1,5 +1,5 @@
 export interface IVideo {
-  _id?: string
+  _id: string
   title: string
   src: string
   type: string
