@@ -5,7 +5,7 @@ type RouteContext = {
   params: Promise<{ id: string }>
 }
 
-export async function GET(request: Request, context: RouteContext) {
+export async function GET(_request: Request, context: RouteContext) {
   try {
     await connectToDatabase()
     const { id } = await context.params
@@ -38,7 +38,7 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(request: Request, context: RouteContext) {
+export async function DELETE(_request: Request, context: RouteContext) {
   try {
     await connectToDatabase()
     const { id } = await context.params

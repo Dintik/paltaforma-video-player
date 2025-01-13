@@ -15,7 +15,7 @@ export const Playlist = () => {
   } = useVideoPlayerStore()
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-3'>
       <div className='flex justify-between items-center'>
         <h3 className='text-gray-900 dark:text-white font-medium'>Playlist</h3>
         <div className='flex items-center gap-2'>
@@ -51,37 +51,38 @@ export const Playlist = () => {
         {videos.map((video, index) => (
           <div
             key={index}
-            className={`flex items-center gap-1 p-2 rounded ${
+            className={`flex items-center gap-2 p-2 rounded ${
               currentVideoIndex === index
                 ? 'bg-gray-300 dark:bg-[#29292e]'
                 : 'bg-gray-200 dark:bg-[#202024] hover:bg-gray-300 dark:hover:bg-[#29292e]'
             }`}
           >
+            {currentVideoIndex === index ? (
+              <Image
+                src={CheckboxSelected}
+                alt='Checkbox selected'
+                className='w-auto h-auto'
+                width={16}
+                height={16}
+              />
+            ) : (
+              <Image
+                src={CheckboxUnselected}
+                alt='Checkbox unselected'
+                className='w-auto h-auto'
+                width={16}
+                height={16}
+              />
+            )}
             <div
-              className='flex-1 flex items-center gap-2 cursor-pointer'
+              className='flex-1 flex items-center gap-2 cursor-pointer overflow-hidden'
               onClick={() =>
                 currentVideoIndex !== index && setCurrentVideoIndex(index)
               }
             >
-              {currentVideoIndex === index ? (
-                <Image
-                  src={CheckboxSelected}
-                  alt='Checkbox selected'
-                  width={16}
-                  height={16}
-                />
-              ) : (
-                <Image
-                  src={CheckboxUnselected}
-                  alt='Checkbox unselected'
-                  className='w-auto h-auto'
-                  width={16}
-                  height={16}
-                />
-              )}
               <div className='flex justify-between items-center w-full gap-3'>
-                <h4 className='text-gray-900 dark:text-white font-medium text-sm'>
-                  {index + 1}. {video.title}
+                <h4 className='text-gray-900 dark:text-white font-medium text-sm overflow-hidden text-ellipsis'>
+                  {video.title}
                 </h4>
                 <span className='text-sm text-gray-600 dark:text-gray-400'>
                   {video.duration}

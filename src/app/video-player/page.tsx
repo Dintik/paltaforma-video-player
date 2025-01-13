@@ -8,6 +8,7 @@ import { usePosterStore } from '@/store/posterStore'
 import { useVideoPlayerStore } from '@/store/videoPlayerStore'
 import { Playlist } from '@/components/Playlist'
 import { VideoPlayer } from '@/components/VideoPlayer'
+import { AddVideoForm } from '@/components/AddVideoForm'
 
 export default function VideoPlayerPage() {
   const { currentVideoIndex, videos, fetchVideos } = useVideoPlayerStore()
@@ -91,7 +92,7 @@ export default function VideoPlayerPage() {
               <h2 className='text-xl font-medium text-gray-900 dark:text-white mb-4'>
                 Description
               </h2>
-              <p className='text-gray-600 dark:text-gray-400'>
+              <p className='text-gray-600 dark:text-gray-400 overflow-hidden text-ellipsis'>
                 {currentVideo.description}
               </p>
             </div>
@@ -99,6 +100,7 @@ export default function VideoPlayerPage() {
         </div>
 
         <div className='w-[295px] bg-gray-100 dark:bg-[#121214] py-6 px-3 h-fit'>
+          <AddVideoForm />
           <Playlist />
         </div>
       </div>

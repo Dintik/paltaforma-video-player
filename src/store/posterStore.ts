@@ -98,11 +98,10 @@ export const usePosterStore = create<PosterStore>()((set, get) => ({
 
         video.onerror = () => {
           clearTimeout(timeoutId)
-          reject(
-            new Error(
-              `Failed to load video: ${video.error?.message || 'unknown error'}`
-            )
-          )
+          set((state) => ({
+            posters: { ...state.posters, [videoUrl]: '/images/default-poster.png' }
+          }))
+          resolve('/images/default-poster.png')
         }
 
         video.onabort = () => {
