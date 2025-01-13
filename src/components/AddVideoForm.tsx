@@ -45,6 +45,7 @@ const VIDEO_TYPES = [
 export function AddVideoForm() {
   const { fetchVideos } = useVideoPlayerStore()
   const { isWebcamActive } = useWebcamStore()
+  const [isVisible, setIsVisible] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState<FormData>({
@@ -108,92 +109,120 @@ export function AddVideoForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={`space-y-3 mb-2 pb-5 border-b-2 border-gray-200 dark:border-gray-700 ${
-        isWebcamActive ? 'opacity-50 pointer-events-none' : ''
-      }`}
-    >
-      <div>
-        <input
-          name='title'
-          value={formData.title}
-          onChange={handleChange}
-          placeholder='Video title'
-          disabled={isWebcamActive}
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
-        />
-        {errors.title && (
-          <p className='text-red-500 text-sm mt-1'>{errors.title}</p>
-        )}
-      </div>
-
-      <div>
-        <input
-          name='src'
-          value={formData.src}
-          onChange={handleChange}
-          placeholder='Video URL'
-          disabled={isWebcamActive}
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
-        />
-        {errors.src && (
-          <p className='text-red-500 text-sm mt-1'>{errors.src}</p>
-        )}
-      </div>
-
-      <div>
-        <input
-          name='duration'
-          value={formData.duration}
-          onChange={handleChange}
-          placeholder='Duration (e.g. 02:30)'
-          disabled={isWebcamActive}
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
-        />
-        {errors.duration && (
-          <p className='text-red-500 text-sm mt-1'>{errors.duration}</p>
-        )}
-      </div>
-
-      <div>
-        <select
-          name='type'
-          value={formData.type}
-          onChange={handleChange}
-          disabled={isWebcamActive}
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+    <div className='mb-4'>
+      <div className='flex justify-between items-center mb-2'>
+        <h3 className='text-gray-900 dark:text-white font-medium'>Add Video</h3>
+        <button
+          onClick={() => setIsVisible(!isVisible)}
+          className='p-2 hover:bg-gray-200 dark:hover:bg-[#202024] rounded-full transition-colors'
+          title={isVisible ? 'Hide form' : 'Show form'}
         >
-          {VIDEO_TYPES.map((type) => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className={`w-4 h-4 text-gray-900 dark:text-white transform transition-transform ${!isVisible ? 'rotate-180' : 'rotate-0'}`}
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M5 15l7-7 7 7'
+            />
+          </svg>
+        </button>
       </div>
 
-      <div>
-        <textarea
-          name='description'
-          value={formData.description}
-          onChange={handleChange}
-          placeholder='Video description'
-          disabled={isWebcamActive}
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
-          rows={3}
-        />
-        {errors.description && (
-          <p className='text-red-500 text-sm mt-1'>{errors.description}</p>
-        )}
-      </div>
+      {isVisible && (
+        <form
+          onSubmit={handleSubmit}
+          className={`space-y-3 ${
+            isWebcamActive ? 'opacity-50 pointer-events-none' : ''
+          }`}
+        >
+          <div>
+            <input
+              name='title'
+              value={formData.title}
+              onChange={handleChange}
+              placeholder='Video title'
+              disabled={isWebcamActive}
+              className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+            />
+            {errors.title && (
+              <p className='text-red-500 text-sm mt-1'>{errors.title}</p>
+            )}
+          </div>
 
-      <button
-        type='submit'
-        disabled={isSubmitting || isWebcamActive}
-        className='w-full p-3 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-      >
-        {isSubmitting ? 'Adding...' : 'Add video'}
-      </button>
-    </form>
+          <div>
+            <input
+              name='src'
+              value={formData.src}
+              onChange={handleChange}
+              placeholder='Video URL'
+              disabled={isWebcamActive}
+              className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+            />
+            {errors.src && (
+              <p className='text-red-500 text-sm mt-1'>{errors.src}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              name='duration'
+              value={formData.duration}
+              onChange={handleChange}
+              placeholder='Duration (e.g. 02:30)'
+              disabled={isWebcamActive}
+              className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+            />
+            {errors.duration && (
+              <p className='text-red-500 text-sm mt-1'>{errors.duration}</p>
+            )}
+          </div>
+
+          <div>
+            <select
+              name='type'
+              value={formData.type}
+              onChange={handleChange}
+              disabled={isWebcamActive}
+              className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {VIDEO_TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <textarea
+              name='description'
+              value={formData.description}
+              onChange={handleChange}
+              placeholder='Video description'
+              disabled={isWebcamActive}
+              className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+              rows={3}
+            />
+            {errors.description && (
+              <p className='text-red-500 text-sm mt-1'>{errors.description}</p>
+            )}
+          </div>
+
+          <button
+            type='submit'
+            disabled={isSubmitting || isWebcamActive}
+            className='w-full p-3 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {isSubmitting ? 'Adding...' : 'Add video'}
+          </button>
+        </form>
+      )}
+    </div>
   )
 }

@@ -94,8 +94,8 @@ export default function VideoPlayerPage() {
 
   return (
     <Container>
-      <div className='flex justify-between'>
-        <div className='w-[626px] flex flex-col'>
+      <div className='flex flex-col-reverse lg:flex-row justify-between gap-6'>
+        <div className='w-full lg:w-[626px] flex flex-col'>
           <CameraControls />
           <VideoPlayer
             videoJsOptions={videoJsOptions}
@@ -103,7 +103,7 @@ export default function VideoPlayerPage() {
           />
 
           {!isWebcamActive && (
-            <div className='py-6'>
+            <div className='py-4 lg:py-6'>
               <div className='flex justify-between items-start mb-4'>
                 <h2 className='text-xl font-medium text-gray-900 dark:text-white'>
                   Description
@@ -117,8 +117,11 @@ export default function VideoPlayerPage() {
           )}
         </div>
 
-        <div className='w-[295px] bg-gray-100 dark:bg-[#121214] py-6 px-3 h-fit'>
+        <div className='w-full lg:w-[295px] bg-gray-100 dark:bg-[#121214] p-4 lg:py-6 lg:px-3 h-fit'>
           <AddVideoForm />
+
+          <div className='border-b-2 border-gray-200 dark:border-gray-700 mb-4'></div>
+
           <Playlist />
         </div>
       </div>

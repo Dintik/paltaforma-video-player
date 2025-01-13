@@ -29,8 +29,9 @@ export default function Header() {
               <span className='w-24 h-6 bg-gray-200 dark:bg-gray-700 rounded' />
             </nav>
             <div className='flex items-center gap-4'>
-              <div className='w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded' />
-              <div className='w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full' />
+              <div className='w-9 h-9 bg-gray-200 dark:bg-gray-700 rounded' />
+              <div className='w-9 h-9 bg-gray-200 dark:bg-gray-700 rounded' />
+              <div className='w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full hidden sm:block' />
             </div>
           </header>
         </Container>
@@ -135,7 +136,7 @@ export default function Header() {
               )}
             </button>
 
-            <div className='w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full'>
+            <div className='w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full hidden sm:block'>
               <Image
                 src={AvatarIcon}
                 alt='User avatar'
