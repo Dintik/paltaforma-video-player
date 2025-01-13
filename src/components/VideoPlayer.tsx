@@ -1,13 +1,13 @@
 'use client'
 
-import { useRef, useEffect, useMemo } from 'react'
-import videojs from 'video.js'
+import { useMemo } from 'react'
 import { VideoJS } from '@/components/VideoJS'
 import { NavigationButton } from '@/components/NavigationButton'
-import Player from 'video.js/dist/types/player'
 import { useVideoPlayerStore } from '@/store/videoPlayerStore'
-import { usePosterStore } from '@/store/posterStore'
 import { useWebcamStore } from '@/store/webcamStore'
+import { useVideoPlayer } from '@/hooks/useVideoPlayer'
+import { useVideoPoster } from '@/hooks/useVideoPoster'
+import { getVideoJsOptions } from '@/config/videoPlayerConfig'
 
 export const VideoPlayer = () => {
   const {
@@ -20,83 +20,18 @@ export const VideoPlayer = () => {
     setCurrentVideoIndex
   } = useVideoPlayerStore()
 
-  const {
-    generatePoster,
-    posters,
-    isLoading: isPosterLoading
-  } = usePosterStore()
-  const { isWebcamActive, stopWebcam } = useWebcamStore()
-
-  const playerRef = useRef<Player>(null)
+  const { isWebcamActive } = useWebcamStore()
   const currentVideo = videos[currentVideoIndex]
 
-  const currentPoster = currentVideo?.src
-    ? posters[currentVideo.src]
-    : undefined
-
-  const isCurrentPosterLoading = isPosterLoading(currentVideo?.src)
-
-  useEffect(() => {
-    if (currentVideo?.src) {
-      generatePoster(currentVideo.src)
-    }
-
-    if (playerRef.current && currentPoster) {
-      try {
-        playerRef.current.poster(currentPoster)
-      } catch (error) {
-        console.warn('Failed to set video poster:', error)
-      }
-    }
-  }, [currentPoster, currentVideo?.src, generatePoster])
-
-  const videoJsOptions = useMemo(
-    () => ({
-      autoplay: true,
-      controls: true,
-      responsive: true,
-      fluid: true,
-      aspectRatio: '16:9',
-      preload: 'auto',
-      poster: currentPoster || '/images/default-poster.png',
-      controlBar: {
-        skipButtons: {
-          backward: 10,
-          forward: 10
-        }
-      },
-      sources: currentVideo
-        ? [
-            {
-              src: currentVideo.src,
-              type: currentVideo.type
-            }
-          ]
-        : []
-    }),
-    [currentVideo, currentPoster]
+  const { handlePlayerReady } = useVideoPlayer()
+  const { currentPoster, isCurrentPosterLoading } = useVideoPoster(
+    currentVideo?.src
   )
 
-  const handlePlayerReady = (player: Player) => {
-    playerRef.current = player
-
-    player.on('waiting', () => {
-      videojs.log('player is waiting')
-    })
-
-    player.on('dispose', () => {
-      videojs.log('player will dispose')
-      if (isWebcamActive) {
-        stopWebcam()
-      }
-    })
-
-    player.on('ended', () => {
-      if (currentVideoIndex < videos.length - 1) {
-        setCurrentVideoIndex(currentVideoIndex + 1)
-      }
-    })
-  }
+  const videoJsOptions = useMemo(
+    () => getVideoJsOptions(currentVideo, currentPoster),
+    [currentVideo, currentPoster]
+  )
 
   return (
     <div className='relative w-full group'>
