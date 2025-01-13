@@ -33,7 +33,7 @@ export const useWebcamStore = create<WebcamStore>()((set, get) => ({
         video: true,
         audio: true // Enable audio for recording
       })
-      
+
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'video/webm'
       })
@@ -46,11 +46,11 @@ export const useWebcamStore = create<WebcamStore>()((set, get) => ({
         }
       }
 
-      set({ 
-        stream, 
+      set({
+        stream,
         mediaRecorder,
-        isWebcamActive: true, 
-        error: null 
+        isWebcamActive: true,
+        error: null
       })
     } catch (err) {
       console.error('Error accessing webcam:', err)
@@ -61,13 +61,13 @@ export const useWebcamStore = create<WebcamStore>()((set, get) => ({
   stopWebcam: () => {
     const { stream, mediaRecorder } = get()
     if (stream) {
-      stream.getTracks().forEach(track => track.stop())
+      stream.getTracks().forEach((track) => track.stop())
     }
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop()
     }
-    set({ 
-      stream: null, 
+    set({
+      stream: null,
       mediaRecorder: null,
       isWebcamActive: false,
       isRecording: false,
@@ -85,7 +85,7 @@ export const useWebcamStore = create<WebcamStore>()((set, get) => ({
 
   stopRecording: async () => {
     const { mediaRecorder, recordedChunks } = get()
-    
+
     if (!mediaRecorder || mediaRecorder.state !== 'recording') {
       throw new Error('No recording in progress')
     }
@@ -97,7 +97,7 @@ export const useWebcamStore = create<WebcamStore>()((set, get) => ({
         set({ isRecording: false })
         resolve(url)
       }
-      
+
       mediaRecorder.stop()
     })
   },
