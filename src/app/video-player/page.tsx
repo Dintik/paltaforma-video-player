@@ -11,7 +11,8 @@ import { VideoPlayer } from '@/components/VideoPlayer'
 import { AddVideoForm } from '@/components/AddVideoForm'
 
 export default function VideoPlayerPage() {
-  const { currentVideoIndex, videos, fetchVideos } = useVideoPlayerStore()
+  const { currentVideoIndex, videos, fetchVideos, setCurrentVideoIndex } =
+    useVideoPlayerStore()
   const { generatePoster, posters } = usePosterStore()
 
   const playerRef = useRef<Player>(null)
@@ -41,7 +42,7 @@ export default function VideoPlayerPage() {
 
   const videoJsOptions = useMemo(
     () => ({
-      autoplay: false,
+      autoplay: true,
       controls: true,
       responsive: true,
       fluid: true,
@@ -75,6 +76,12 @@ export default function VideoPlayerPage() {
 
     player.on('dispose', () => {
       videojs.log('player will dispose')
+    })
+
+    player.on('ended', () => {
+      if (currentVideoIndex < videos.length - 1) {
+        setCurrentVideoIndex(currentVideoIndex + 1)
+      }
     })
   }
 
