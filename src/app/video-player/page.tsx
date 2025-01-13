@@ -11,12 +11,13 @@ import { Playlist } from '@/components/Playlist'
 import { VideoPlayer } from '@/components/VideoPlayer'
 import { AddVideoForm } from '@/components/AddVideoForm'
 import { VideoRating } from '@/components/VideoRating'
+import { CameraControls } from '@/components/CameraControls'
 
 export default function VideoPlayerPage() {
   const { currentVideoIndex, videos, fetchVideos, setCurrentVideoIndex } =
     useVideoPlayerStore()
   const { generatePoster, posters } = usePosterStore()
-  const { isWebcamActive, startWebcam, stopWebcam } = useWebcamStore()
+  const { isWebcamActive, stopWebcam } = useWebcamStore()
 
   const playerRef = useRef<Player>(null)
   const currentVideo = videos[currentVideoIndex]
@@ -91,26 +92,11 @@ export default function VideoPlayerPage() {
     })
   }
 
-  const handleWebcamToggle = async () => {
-    if (isWebcamActive) {
-      stopWebcam()
-    } else {
-      await startWebcam()
-    }
-  }
-
   return (
     <Container>
       <div className='flex justify-between'>
         <div className='w-[626px] flex flex-col'>
-          <div className='flex justify-end mb-4'>
-            <button
-              onClick={handleWebcamToggle}
-              className='px-4 py-2 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors'
-            >
-              {isWebcamActive ? 'Turn Off Camera' : 'Turn On Camera'}
-            </button>
-          </div>
+          <CameraControls />
           <VideoPlayer
             videoJsOptions={videoJsOptions}
             handlePlayerReady={handlePlayerReady}
