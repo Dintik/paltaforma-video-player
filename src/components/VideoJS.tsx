@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import videojs from 'video.js'
 import Player from 'video.js/dist/types/player'
+import { useWebcamStore } from '@/store/webcamStore'
 import 'video.js/dist/video-js.css'
 
 interface VideoJSProps {
@@ -12,6 +13,7 @@ interface VideoJSProps {
 export const VideoJS = ({ options, onReady, className = '' }: VideoJSProps) => {
   const videoRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<Player>(null)
+  const { stream, isWebcamActive } = useWebcamStore()
 
   useEffect(() => {
     if (!playerRef.current) {
@@ -27,10 +29,28 @@ export const VideoJS = ({ options, onReady, className = '' }: VideoJSProps) => {
       }))
     } else {
       const player = playerRef.current
+
+      if (isWebcamActive && stream) {
+        // Switch to webcam stream
+        try {
+          player.controls(false)
+          const videoElement = player.tech().el() as HTMLVideoElement
+          videoElement.srcObject = stream
+        } catch (error) {
+          console.error('Error setting webcam stream:', error)
+        }
+      } else {
+        // Switch back to regular video
+        const videoElement = player.tech().el() as HTMLVideoElement
+        videoElement.srcObject = null
+        player.src(options.sources)
+        player.poster(options.poster)
+        player.controls(true)
+      }
+
       player.autoplay(options.autoplay)
-      player.src(options.sources)
     }
-  }, [options, videoRef, onReady])
+  }, [options, videoRef, onReady, stream, isWebcamActive])
 
   useEffect(() => {
     const player = playerRef.current

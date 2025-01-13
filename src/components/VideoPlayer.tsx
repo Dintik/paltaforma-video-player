@@ -1,8 +1,11 @@
+'use client'
+
 import { VideoJS } from '@/components/VideoJS'
 import { NavigationButton } from '@/components/NavigationButton'
 import Player from 'video.js/dist/types/player'
 import { useVideoPlayerStore } from '@/store/videoPlayerStore'
 import { usePosterStore } from '@/store/posterStore'
+import { useWebcamStore } from '@/store/webcamStore'
 
 type VideoJsOptions = {
   autoplay: boolean
@@ -33,6 +36,7 @@ export const VideoPlayer = ({
     setCurrentVideoIndex
   } = useVideoPlayerStore()
 
+  const { isWebcamActive } = useWebcamStore()
   const { isLoading: isPosterLoading } = usePosterStore()
 
   const currentVideo = videos[currentVideoIndex]
@@ -101,7 +105,7 @@ export const VideoPlayer = ({
         </div>
       ) : (
         <>
-          {currentVideoIndex !== 0 && (
+          {!isWebcamActive && currentVideoIndex !== 0 && (
             <NavigationButton
               direction='prev'
               onClick={() => setCurrentVideoIndex(currentVideoIndex - 1)}
@@ -118,7 +122,7 @@ export const VideoPlayer = ({
             )}
           </div>
 
-          {currentVideoIndex !== videos.length - 1 && (
+          {!isWebcamActive && currentVideoIndex !== videos.length - 1 && (
             <NavigationButton
               direction='next'
               onClick={() => setCurrentVideoIndex(currentVideoIndex + 1)}

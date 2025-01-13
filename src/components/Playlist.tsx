@@ -2,6 +2,7 @@ import Image from 'next/image'
 import CheckboxSelected from '@/assets/images/CheckboxSelected.svg'
 import CheckboxUnselected from '@/assets/images/CheckboxUnselected.svg'
 import { useVideoPlayerStore } from '@/store/videoPlayerStore'
+import { useWebcamStore } from '@/store/webcamStore'
 
 export const Playlist = () => {
   const {
@@ -14,6 +15,8 @@ export const Playlist = () => {
     setCurrentVideoIndex
   } = useVideoPlayerStore()
 
+  const { isWebcamActive } = useWebcamStore()
+
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex justify-between items-center'>
@@ -24,9 +27,9 @@ export const Playlist = () => {
           </span>
           <button
             onClick={resetToDefault}
-            className='p-2 text-sm hover:text-blue-600 transition-colors'
+            className='p-2 text-sm hover:text-blue-600 transition-colors disabled:opacity-50 disabled:hover:text-current'
             title='Reset to default videos'
-            disabled={isResetting}
+            disabled={isResetting || isWebcamActive}
           >
             <svg
               className={`w-4 h-4 text-gray-900 dark:text-white ${
@@ -51,13 +54,15 @@ export const Playlist = () => {
         {videos.map((video, index) => (
           <div
             key={index}
-            className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
+            className={`flex items-center gap-2 p-2 rounded ${
               currentVideoIndex === index
                 ? 'bg-gray-300 dark:bg-[#29292e]'
                 : 'bg-gray-200 dark:bg-[#202024] hover:bg-gray-300 dark:hover:bg-[#29292e]'
-            }`}
+            } ${isWebcamActive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             onClick={() =>
-              currentVideoIndex !== index && setCurrentVideoIndex(index)
+              !isWebcamActive &&
+              currentVideoIndex !== index &&
+              setCurrentVideoIndex(index)
             }
           >
             {currentVideoIndex === index ? (
@@ -92,8 +97,8 @@ export const Playlist = () => {
                 e.stopPropagation()
                 await deleteVideo(video._id)
               }}
-              disabled={deletingId === video._id}
-              className='p-1.5 text-gray-500 hover:text-red-500 transition-colors rounded-full hover:bg-gray-400/10 disabled:opacity-50'
+              disabled={deletingId === video._id || isWebcamActive}
+              className='p-1.5 text-gray-500 hover:text-red-500 transition-colors rounded-full hover:bg-gray-400/10 disabled:opacity-50 disabled:hover:text-current'
               title='Delete video'
             >
               {deletingId === video._id ? (

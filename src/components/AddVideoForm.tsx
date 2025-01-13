@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react'
 import Joi from 'joi'
 import { useVideoPlayerStore } from '@/store/videoPlayerStore'
+import { useWebcamStore } from '@/store/webcamStore'
 import { videoService } from '@/services/api'
 
 const videoSchema = Joi.object({
@@ -43,6 +44,7 @@ const VIDEO_TYPES = [
 
 export function AddVideoForm() {
   const { fetchVideos } = useVideoPlayerStore()
+  const { isWebcamActive } = useWebcamStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState<FormData>({
@@ -71,6 +73,7 @@ export function AddVideoForm() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (isWebcamActive) return
 
     const { error } = videoSchema.validate(formData, { abortEarly: false })
 
@@ -107,7 +110,9 @@ export function AddVideoForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className='space-y-3 mb-2 pb-5 border-b-2 border-gray-200 dark:border-gray-700'
+      className={`space-y-3 mb-2 pb-5 border-b-2 border-gray-200 dark:border-gray-700 ${
+        isWebcamActive ? 'opacity-50 pointer-events-none' : ''
+      }`}
     >
       <div>
         <input
@@ -115,7 +120,8 @@ export function AddVideoForm() {
           value={formData.title}
           onChange={handleChange}
           placeholder='Video title'
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none'
+          disabled={isWebcamActive}
+          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
         />
         {errors.title && (
           <p className='text-red-500 text-sm mt-1'>{errors.title}</p>
@@ -128,7 +134,8 @@ export function AddVideoForm() {
           value={formData.src}
           onChange={handleChange}
           placeholder='Video URL'
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none'
+          disabled={isWebcamActive}
+          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
         />
         {errors.src && (
           <p className='text-red-500 text-sm mt-1'>{errors.src}</p>
@@ -141,7 +148,8 @@ export function AddVideoForm() {
           value={formData.duration}
           onChange={handleChange}
           placeholder='Duration (e.g. 02:30)'
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none'
+          disabled={isWebcamActive}
+          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
         />
         {errors.duration && (
           <p className='text-red-500 text-sm mt-1'>{errors.duration}</p>
@@ -153,7 +161,8 @@ export function AddVideoForm() {
           name='type'
           value={formData.type}
           onChange={handleChange}
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none'
+          disabled={isWebcamActive}
+          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
         >
           {VIDEO_TYPES.map((type) => (
             <option key={type.value} value={type.value}>
@@ -169,7 +178,8 @@ export function AddVideoForm() {
           value={formData.description}
           onChange={handleChange}
           placeholder='Video description'
-          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none'
+          disabled={isWebcamActive}
+          className='w-full px-2 py-1 text-sm text-gray-900 dark:text-white bg-gray-200 dark:bg-[#202024] border-gray-300 dark:border-gray-700 rounded hover:bg-gray-300 dark:hover:bg-[#29292e] focus:bg-gray-300 dark:focus:bg-[#29292e] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
           rows={3}
         />
         {errors.description && (
@@ -179,8 +189,8 @@ export function AddVideoForm() {
 
       <button
         type='submit'
-        disabled={isSubmitting}
-        className='w-full p-3 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors disabled:opacity-50'
+        disabled={isSubmitting || isWebcamActive}
+        className='w-full p-3 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
       >
         {isSubmitting ? 'Adding...' : 'Add video'}
       </button>
