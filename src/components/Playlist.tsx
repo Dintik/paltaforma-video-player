@@ -51,11 +51,14 @@ export const Playlist = () => {
         {videos.map((video, index) => (
           <div
             key={index}
-            className={`flex items-center gap-2 p-2 rounded ${
+            className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
               currentVideoIndex === index
                 ? 'bg-gray-300 dark:bg-[#29292e]'
                 : 'bg-gray-200 dark:bg-[#202024] hover:bg-gray-300 dark:hover:bg-[#29292e]'
             }`}
+            onClick={() =>
+              currentVideoIndex !== index && setCurrentVideoIndex(index)
+            }
           >
             {currentVideoIndex === index ? (
               <Image
@@ -74,12 +77,7 @@ export const Playlist = () => {
                 height={16}
               />
             )}
-            <div
-              className='flex-1 flex items-center gap-2 cursor-pointer overflow-hidden'
-              onClick={() =>
-                currentVideoIndex !== index && setCurrentVideoIndex(index)
-              }
-            >
+            <div className='flex-1 flex items-center gap-2 overflow-hidden'>
               <div className='flex justify-between items-center w-full gap-3'>
                 <h4 className='text-gray-900 dark:text-white font-medium text-sm overflow-hidden text-ellipsis'>
                   {video.title}
@@ -90,7 +88,8 @@ export const Playlist = () => {
               </div>
             </div>
             <button
-              onClick={async () => {
+              onClick={async (e) => {
+                e.stopPropagation()
                 await deleteVideo(video._id)
               }}
               disabled={deletingId === video._id}

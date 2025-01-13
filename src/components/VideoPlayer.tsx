@@ -83,16 +83,16 @@ export const VideoPlayer = ({
             <p className='text-gray-600 dark:text-gray-400'>
               There are currently no videos in the playlist.
             </p>
-            <div className='flex gap-2'>
+            <div className='flex gap-5'>
               <button
                 onClick={fetchVideos}
-                className='mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors'
+                className='w-full px-6 py-2 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors disabled:opacity-50'
               >
                 Refresh
               </button>
               <button
                 onClick={resetToDefault}
-                className='mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors'
+                className='w-full px-6 py-2 text-sm font-bold text-gray-900 dark:text-white bg-gray-300 dark:bg-[#29292e] rounded-lg hover:bg-gray-400 dark:hover:bg-[#323238] transition-colors disabled:opacity-50'
               >
                 Reset
               </button>
