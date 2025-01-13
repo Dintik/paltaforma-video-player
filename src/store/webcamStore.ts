@@ -34,8 +34,8 @@ export const useWebcamStore = create<WebcamStore>()((set) => ({
   stopWebcam: () => {
     const { stream } = useWebcamStore.getState()
     if (stream) {
-      stream.getTracks().forEach(track => track.stop())
+      stream.getTracks().forEach((track) => track.stop())
     }
     set({ stream: null, isWebcamActive: false })
   }
-})) 
+}))

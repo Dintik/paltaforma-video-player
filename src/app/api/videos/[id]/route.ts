@@ -27,7 +27,7 @@ export async function PUT(request: Request, context: RouteContext) {
     await connectToDatabase()
     const { id } = await context.params
     const data = await request.json()
-    
+
     const video = await Video.collection.updateOne(
       { _id: new mongoose.Types.ObjectId(id) },
       { $set: data }
@@ -37,10 +37,10 @@ export async function PUT(request: Request, context: RouteContext) {
       return Response.json({ error: 'Video not found' }, { status: 404 })
     }
 
-    const updatedVideo = await Video.collection.findOne({ 
-      _id: new mongoose.Types.ObjectId(id) 
+    const updatedVideo = await Video.collection.findOne({
+      _id: new mongoose.Types.ObjectId(id)
     })
-    
+
     return Response.json(updatedVideo)
   } catch (error) {
     console.error('PUT /videos error:', error)
