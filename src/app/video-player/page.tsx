@@ -10,24 +10,8 @@ import { Playlist } from '@/components/Playlist'
 import { VideoPlayer } from '@/components/VideoPlayer'
 
 export default function VideoPlayerPage() {
-  const {
-    currentVideoIndex,
-    videos,
-    isInitialLoading,
-    isResetting,
-    error,
-    deletingId,
-    fetchVideos,
-    deleteVideo,
-    resetToDefault,
-    setCurrentVideoIndex
-  } = useVideoPlayerStore()
-
-  const {
-    generatePoster,
-    posters,
-    isLoading: isPosterLoading
-  } = usePosterStore()
+  const { currentVideoIndex, videos, fetchVideos } = useVideoPlayerStore()
+  const { generatePoster, posters } = usePosterStore()
 
   const playerRef = useRef<Player>(null)
   const currentVideo = videos[currentVideoIndex]
@@ -35,7 +19,6 @@ export default function VideoPlayerPage() {
   const currentPoster = currentVideo?.src
     ? posters[currentVideo.src]
     : undefined
-  const isCurrentPosterLoading = isPosterLoading(currentVideo?.src)
 
   useEffect(() => {
     if (currentVideo?.src) {
@@ -66,7 +49,8 @@ export default function VideoPlayerPage() {
       poster: currentPoster || '/images/default-poster.png',
       controlBar: {
         skipButtons: {
-          backward: 10
+          backward: 10,
+          forward: 10
         }
       },
       sources: currentVideo
@@ -98,16 +82,8 @@ export default function VideoPlayerPage() {
       <div className='flex justify-between'>
         <div className='w-[626px] flex flex-col'>
           <VideoPlayer
-            videos={videos}
-            currentVideoIndex={currentVideoIndex}
             videoJsOptions={videoJsOptions}
             handlePlayerReady={handlePlayerReady}
-            isPosterLoading={isCurrentPosterLoading}
-            resetToDefault={resetToDefault}
-            isInitialLoading={isInitialLoading}
-            error={error}
-            fetchVideos={fetchVideos}
-            handleVideoChange={setCurrentVideoIndex}
           />
 
           {currentVideo?.description && (
@@ -122,17 +98,9 @@ export default function VideoPlayerPage() {
           )}
         </div>
 
-        <Playlist
-          videos={videos}
-          currentVideoIndex={currentVideoIndex}
-          onVideoSelect={setCurrentVideoIndex}
-          onDeleteVideo={async (id) => {
-            await deleteVideo(id)
-          }}
-          deletingId={deletingId}
-          isResetting={isResetting}
-          onReset={resetToDefault}
-        />
+        <div className='w-[295px] bg-gray-100 dark:bg-[#121214] py-6 px-3 h-fit'>
+          <Playlist />
+        </div>
       </div>
     </Container>
   )

@@ -1,7 +1,8 @@
 import { VideoJS } from '@/components/VideoJS'
 import { NavigationButton } from '@/components/NavigationButton'
 import Player from 'video.js/dist/types/player'
-import { IVideo } from '@/types/video.types'
+import { useVideoPlayerStore } from '@/store/videoPlayerStore'
+import { usePosterStore } from '@/store/posterStore'
 
 type VideoJsOptions = {
   autoplay: boolean
@@ -14,30 +15,29 @@ type VideoJsOptions = {
 }
 
 type VideoPlayerProps = {
-  videos: IVideo[]
-  currentVideoIndex: number
   videoJsOptions: VideoJsOptions
   handlePlayerReady: (player: Player) => void
-  isPosterLoading: boolean
-  resetToDefault: () => void
-  isInitialLoading?: boolean
-  error?: string | null
-  fetchVideos: () => void
-  handleVideoChange: (index: number) => void
 }
 
 export const VideoPlayer = ({
-  videos,
-  currentVideoIndex,
   videoJsOptions,
-  handlePlayerReady,
-  isPosterLoading,
-  resetToDefault,
-  isInitialLoading,
-  error,
-  fetchVideos,
-  handleVideoChange
+  handlePlayerReady
 }: VideoPlayerProps) => {
+  const {
+    currentVideoIndex,
+    videos,
+    isInitialLoading,
+    error,
+    fetchVideos,
+    resetToDefault,
+    setCurrentVideoIndex
+  } = useVideoPlayerStore()
+
+  const { isLoading: isPosterLoading } = usePosterStore()
+
+  const currentVideo = videos[currentVideoIndex]
+  const isCurrentPosterLoading = isPosterLoading(currentVideo?.src)
+
   return (
     <div className='relative w-full group'>
       {isInitialLoading ? (
@@ -104,12 +104,12 @@ export const VideoPlayer = ({
           {currentVideoIndex !== 0 && (
             <NavigationButton
               direction='prev'
-              onClick={() => handleVideoChange(currentVideoIndex - 1)}
+              onClick={() => setCurrentVideoIndex(currentVideoIndex - 1)}
             />
           )}
 
           <div className='relative'>
-            {isPosterLoading ? (
+            {isCurrentPosterLoading ? (
               <div className='w-full aspect-video bg-black flex items-center justify-center'>
                 <div className='w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin' />
               </div>
@@ -121,7 +121,7 @@ export const VideoPlayer = ({
           {currentVideoIndex !== videos.length - 1 && (
             <NavigationButton
               direction='next'
-              onClick={() => handleVideoChange(currentVideoIndex + 1)}
+              onClick={() => setCurrentVideoIndex(currentVideoIndex + 1)}
             />
           )}
         </>
