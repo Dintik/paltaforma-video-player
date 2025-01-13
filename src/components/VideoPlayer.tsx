@@ -1,5 +1,7 @@
 'use client'
 
+import { useRef, useEffect, useMemo } from 'react'
+import videojs from 'video.js'
 import { VideoJS } from '@/components/VideoJS'
 import { NavigationButton } from '@/components/NavigationButton'
 import Player from 'video.js/dist/types/player'
@@ -7,25 +9,7 @@ import { useVideoPlayerStore } from '@/store/videoPlayerStore'
 import { usePosterStore } from '@/store/posterStore'
 import { useWebcamStore } from '@/store/webcamStore'
 
-type VideoJsOptions = {
-  autoplay: boolean
-  controls: boolean
-  responsive: boolean
-  fluid: boolean
-  aspectRatio: string
-  preload: string
-  poster: string
-}
-
-type VideoPlayerProps = {
-  videoJsOptions: VideoJsOptions
-  handlePlayerReady: (player: Player) => void
-}
-
-export const VideoPlayer = ({
-  videoJsOptions,
-  handlePlayerReady
-}: VideoPlayerProps) => {
+export const VideoPlayer = () => {
   const {
     currentVideoIndex,
     videos,
@@ -36,11 +20,83 @@ export const VideoPlayer = ({
     setCurrentVideoIndex
   } = useVideoPlayerStore()
 
-  const { isWebcamActive } = useWebcamStore()
-  const { isLoading: isPosterLoading } = usePosterStore()
+  const {
+    generatePoster,
+    posters,
+    isLoading: isPosterLoading
+  } = usePosterStore()
+  const { isWebcamActive, stopWebcam } = useWebcamStore()
 
+  const playerRef = useRef<Player>(null)
   const currentVideo = videos[currentVideoIndex]
+
+  const currentPoster = currentVideo?.src
+    ? posters[currentVideo.src]
+    : undefined
+
   const isCurrentPosterLoading = isPosterLoading(currentVideo?.src)
+
+  useEffect(() => {
+    if (currentVideo?.src) {
+      generatePoster(currentVideo.src)
+    }
+
+    if (playerRef.current && currentPoster) {
+      try {
+        playerRef.current.poster(currentPoster)
+      } catch (error) {
+        console.warn('Failed to set video poster:', error)
+      }
+    }
+  }, [currentPoster, currentVideo?.src, generatePoster])
+
+  const videoJsOptions = useMemo(
+    () => ({
+      autoplay: true,
+      controls: true,
+      responsive: true,
+      fluid: true,
+      aspectRatio: '16:9',
+      preload: 'auto',
+      poster: currentPoster || '/images/default-poster.png',
+      controlBar: {
+        skipButtons: {
+          backward: 10,
+          forward: 10
+        }
+      },
+      sources: currentVideo
+        ? [
+            {
+              src: currentVideo.src,
+              type: currentVideo.type
+            }
+          ]
+        : []
+    }),
+    [currentVideo, currentPoster]
+  )
+
+  const handlePlayerReady = (player: Player) => {
+    playerRef.current = player
+
+    player.on('waiting', () => {
+      videojs.log('player is waiting')
+    })
+
+    player.on('dispose', () => {
+      videojs.log('player will dispose')
+      if (isWebcamActive) {
+        stopWebcam()
+      }
+    })
+
+    player.on('ended', () => {
+      if (currentVideoIndex < videos.length - 1) {
+        setCurrentVideoIndex(currentVideoIndex + 1)
+      }
+    })
+  }
 
   return (
     <div className='relative w-full group'>
