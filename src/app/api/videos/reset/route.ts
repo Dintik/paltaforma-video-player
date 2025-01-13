@@ -7,7 +7,7 @@ export async function POST() {
   try {
     await connectToDatabase()
     await Video.deleteMany({}) // Delete all videos
-    await Video.insertMany(defaultVideosData.videos) // Add default videos
+    await Video.collection.insertMany(defaultVideosData.videos) // Add default videos
     return NextResponse.json({ message: 'Database reset successfully' })
   } catch (error) {
     console.error('Reset error:', error)

@@ -23,6 +23,12 @@ const VideoSchema = new mongoose.Schema<IVideo>(
     description: {
       type: String,
       required: [true, 'Description is required']
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
     }
   },
   {

@@ -29,5 +29,10 @@ export const videoService = {
   async resetToDefault() {
     const { data } = await api.post('/videos/reset')
     return data
+  },
+
+  async updateRating(id: string, rating: number) {
+    const { data } = await api.put<IVideo>(`/videos/${id}`, { rating })
+    return data
   }
 }

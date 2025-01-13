@@ -1,5 +1,6 @@
 import { connectToDatabase } from '@/lib/mongodb'
 import Video from '@/models/video.model'
+import mongoose from 'mongoose'
 
 type RouteContext = {
   params: Promise<{ id: string }>
@@ -26,14 +27,23 @@ export async function PUT(request: Request, context: RouteContext) {
     await connectToDatabase()
     const { id } = await context.params
     const data = await request.json()
-    const video = await Video.findByIdAndUpdate(id, data, { new: true })
+    
+    const video = await Video.collection.updateOne(
+      { _id: new mongoose.Types.ObjectId(id) },
+      { $set: data }
+    )
 
-    if (!video) {
+    if (video.matchedCount === 0) {
       return Response.json({ error: 'Video not found' }, { status: 404 })
     }
-    return Response.json(video)
+
+    const updatedVideo = await Video.collection.findOne({ 
+      _id: new mongoose.Types.ObjectId(id) 
+    })
+    
+    return Response.json(updatedVideo)
   } catch (error) {
-    console.error('POST /videos error:', error)
+    console.error('PUT /videos error:', error)
     return Response.json({ error: 'Failed to update video' }, { status: 500 })
   }
 }

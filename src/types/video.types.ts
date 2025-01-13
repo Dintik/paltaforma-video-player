@@ -5,6 +5,7 @@ export interface IVideo {
   type: string
   duration: string
   description: string
+  rating?: number
   createdAt?: Date
   updatedAt?: Date
 }

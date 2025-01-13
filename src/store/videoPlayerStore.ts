@@ -16,6 +16,7 @@ interface VideoActions {
   fetchVideos: () => Promise<void>
   deleteVideo: (id: string) => Promise<void>
   resetToDefault: () => Promise<void>
+  updateVideoRating: (id: string, rating: number) => Promise<void>
 }
 
 type VideoStore = VideoState & VideoActions
@@ -83,6 +84,20 @@ export const useVideoPlayerStore = create<VideoStore>()((set, get) => ({
       set({ error: 'Failed to reset videos' })
     } finally {
       set({ isResetting: false })
+    }
+  },
+
+  updateVideoRating: async (id: string, rating: number) => {
+    try {
+      const updatedVideo = await videoService.updateRating(id, rating)
+      const { videos } = get()
+      const updatedVideos = videos.map((video) =>
+        video._id === id ? { ...video, rating: updatedVideo.rating } : video
+      )
+      set({ videos: updatedVideos })
+    } catch (error) {
+      console.error('Error updating video rating:', error)
+      throw error
     }
   }
 }))

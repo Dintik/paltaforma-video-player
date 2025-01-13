@@ -9,6 +9,7 @@ import { useVideoPlayerStore } from '@/store/videoPlayerStore'
 import { Playlist } from '@/components/Playlist'
 import { VideoPlayer } from '@/components/VideoPlayer'
 import { AddVideoForm } from '@/components/AddVideoForm'
+import { VideoRating } from '@/components/VideoRating'
 
 export default function VideoPlayerPage() {
   const { currentVideoIndex, videos, fetchVideos, setCurrentVideoIndex } =
@@ -96,9 +97,12 @@ export default function VideoPlayerPage() {
 
           {currentVideo?.description && (
             <div className='py-6'>
-              <h2 className='text-xl font-medium text-gray-900 dark:text-white mb-4'>
-                Description
-              </h2>
+              <div className='flex justify-between items-start mb-4'>
+                <h2 className='text-xl font-medium text-gray-900 dark:text-white'>
+                  Description
+                </h2>
+                <VideoRating />
+              </div>
               <p className='text-gray-600 dark:text-gray-400 overflow-hidden text-ellipsis'>
                 {currentVideo.description}
               </p>
